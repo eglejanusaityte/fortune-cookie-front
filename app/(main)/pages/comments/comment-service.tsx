@@ -6,9 +6,9 @@ export const sendMessage = async (comment) => {
         const response = await fetch(`${API_URL}/comment`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(comment),
+            body: JSON.stringify(comment)
         });
 
         if (!response.ok) {
@@ -24,12 +24,12 @@ export const sendMessage = async (comment) => {
 
 export const getMessages = async (commentId) => {
     try {
-        const response = await fetch(`${API_URL}/comment/id/${commentId}`);
-
+        const response = await fetch(`${API_URL}/comment/${commentId}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-
+        const response_lol = await response.json();
+        console.log(response_lol);
         return await response.json();
     } catch (error) {
         console.error('Error getting messages', error);
@@ -38,7 +38,7 @@ export const getMessages = async (commentId) => {
 };
 
 export const subscribeToMessages = (commentId, onMessageReceived) => {
-    const eventSource = new EventSource(`${API_URL}/comment/id/${commentId}`);
+    const eventSource = new EventSource(`${API_URL}/comment/${commentId}`);
     eventSource.onmessage = (event) => {
         const newMessage = JSON.parse(event.data);
         onMessageReceived(newMessage);
@@ -55,15 +55,15 @@ export const subscribeToMessages = (commentId, onMessageReceived) => {
 // move to a new service
 export const likeCookie = async (cookieId) => {
     try {
-    const response = await fetch(`${DIFF_API_URL}/api/v1/fortune-cookies/${cookieId}/like`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+        const response = await fetch(`${DIFF_API_URL}/api/v1/fortune-cookies/${cookieId}/like`, {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
     } catch (error) {
         console.error('Error sending message', error);
         throw error;
@@ -75,8 +75,8 @@ export const removeLikeCookie = async (cookieId) => {
         const response = await fetch(`${DIFF_API_URL}/api/v1/fortune-cookies/${cookieId}/remove`, {
             method: 'PUT',
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
         });
         if (!response.ok) {
             throw new Error('Network response was not ok');

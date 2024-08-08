@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useState, useEffect } from 'react';
-import { Checkbox } from 'primereact/checkbox';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
+import { Toast } from 'primereact/toast';
 import { LayoutContext } from '../../../../layout/context/layoutcontext';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
@@ -12,9 +12,11 @@ import { REGISTERURL } from '@/app/api/urls';
 import userIsOnline from '@/app/api/logic';
 
 const RegisterPage = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const { layoutConfig } = useContext(LayoutContext);
+    const toast = useRef<Toast>(null);
 
     const router = useRouter();
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
@@ -26,18 +28,23 @@ const RegisterPage = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, username, password })
             });
 
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Something went wrong during registration');
             }
             const data = await response.json();
             localStorage.setItem('token', data.token);
             router.push('/');
         } catch (error) {
-            // TO-DO: replace with actual error output
-            console.error('Error during login:', error);
+            toast.current?.show({
+                severity: 'warn',
+                summary: 'Error',
+                detail: `Error signing up: ${error.message}`,
+                life: 3000
+            });
         }
     };
 
@@ -50,6 +57,7 @@ const RegisterPage = () => {
     return (
         <div className={containerClassName}>
             <div className="flex flex-column align-items-center justify-content-center">
+                <Toast ref={toast} />
                 <div
                     style={{
                         borderRadius: '56px',
@@ -64,10 +72,15 @@ const RegisterPage = () => {
                         </div>
 
                         <div>
+                            <label htmlFor="username1" className="block text-900 text-xl font-medium mb-2">
+                                Username
+                            </label>
+                            <InputText id="username1" type="text" onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
+
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Email
                             </label>
-                            <InputText id="email1" type="text" onChange={(e) => setEmail(e.target.value)} placeholder="Email address" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
+                            <InputText id="email1" type="text" onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
 
                             <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
                                 Password

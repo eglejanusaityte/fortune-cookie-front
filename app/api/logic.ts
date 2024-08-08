@@ -1,4 +1,4 @@
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
 
 export default function userIsOnline() {
     if (localStorage.getItem('token') !== null) {
@@ -15,5 +15,16 @@ export const getUsernameFromToken = () => {
     } catch (error) {
         console.error('Error decoding token', error);
         return null;
+    }
+};
+
+export const userIsAdmin = () => {
+    try {
+        const token = localStorage.getItem('token');
+        const decodedToken = jwtDecode(token);
+        return decodedToken.role === 'ADMIN';
+    } catch (error) {
+        console.error('Error decoding token', error);
+        return false;
     }
 };

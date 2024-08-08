@@ -104,11 +104,10 @@ declare namespace Demo {
 
     interface User {
         id: number;
-        name: string;
-        image: string;
-        status: string;
-        messages: Message[];
-        lastSeen: string;
+        username: string;
+        email: string;
+        password: string;
+        role: string;
     }
 
     interface Message {
